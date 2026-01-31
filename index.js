@@ -34,7 +34,7 @@ app.use(express.json({
 
 const kafka = new Kafka({
   clientId: "payment-service",
-  brokers: [process.env.KAFKA_BROKER || "localhost:9094"],
+  brokers: ["0.tcp.in.ngrok.io:19532"], // ngrok public broker address
 });
 
 const producer = kafka.producer();
