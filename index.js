@@ -32,10 +32,27 @@ app.use(express.json({
 // KAFKA SETUP
 // =============================================================================
 
-const kafka = new Kafka({
+// Kafka configuration - supports both local and cloud (Upstash/Confluent)
+const kafkaBrokers = process.env.KAFKA_BROKERS 
+  ? process.env.KAFKA_BROKERS.split(',').map(b => b.trim())
+  : ["localhost:9094"];
+
+const kafkaConfig = {
   clientId: "payment-service",
-  brokers: ["0.tcp.in.ngrok.io:19532"], // ngrok public broker address
-});
+  brokers: kafkaBrokers,
+};
+
+// Add SASL authentication if credentials are provided (for Upstash/Confluent)
+if (process.env.KAFKA_USE_SASL === 'true' && process.env.KAFKA_USERNAME && process.env.KAFKA_PASSWORD) {
+  kafkaConfig.sasl = {
+    mechanism: 'plain',
+    username: process.env.KAFKA_USERNAME,
+    password: process.env.KAFKA_PASSWORD,
+  };
+  kafkaConfig.ssl = true; // Upstash/Confluent require SSL
+}
+
+const kafka = new Kafka(kafkaConfig);
 
 const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: "payment-group" });
