@@ -16,12 +16,17 @@ const app = express();
 const PORT = process.env.PORT || 4002;
 
 // CORS configuration
-const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:3000")
+const allowedOrigins = (process.env.CORS_ORIGINS || "https://microservices-ecom.vercel.app,http://localhost:3000,http://localhost:3001")
   .split(",")
-  .map((origin) => origin.trim())
+  .map((o) => o.trim())
   .filter(Boolean);
 
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 
 // JSON parser with raw body for webhook signature verification
 app.use(express.json({
